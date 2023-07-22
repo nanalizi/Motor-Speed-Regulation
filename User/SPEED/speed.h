@@ -1,0 +1,62 @@
+#ifndef __SPEED_H
+#define __SPEED_H
+
+
+#include "stm32f10x.h"
+
+/************通用定时器TIM参数定义，只限TIM2、3、4、5************/
+// 当使用不同的定时器的时候，对应的GPIO是不一样的，这点要注意
+// 我们这里默认使用TIM5
+
+#define            SPEED_TIM                   TIM3
+#define            SPEED_TIM_APBxClock_FUN     RCC_APB1PeriphClockCmd
+#define            SPEED_TIM_CLK               RCC_APB1Periph_TIM3
+#define            SPEED_TIM_PERIOD            0XFFFF
+#define            SPEED_TIM_PSC              (72-1)
+
+// TIM 输入捕获通道GPIO相关宏定义
+// 输入捕获能捕获到的最小的频率为 72M/{ (ARR+1)*(PSC+1) }
+#define            SPEED_TIM_CH1_GPIO_CLK      RCC_APB2Periph_GPIOA
+#define            SPEED_TIM_CH1_PORT          GPIOA
+#define            SPEED_TIM_CH1_PIN           GPIO_Pin_6
+#define            SPEED_TIM_CHANNEL_x         TIM_Channel_1
+
+// 中断相关宏定义
+#define            SPEED_TIM_IT_CCx            TIM_IT_CC1
+#define            SPEED_TIM_IRQ               TIM3_IRQn//定时器所有中断都用这个，进入中断再根据实际情况决定是那种中断
+#define            SPEED_TIM_INT_FUN           TIM3_IRQHandler
+
+// 获取捕获寄存器值函数宏定义
+#define            SPEED_TIM_GetCapturex_FUN                 TIM_GetCapture1
+// 捕获信号极性函数宏定义
+#define            SPEED_TIM_OCxPolarityConfig_FUN           TIM_OC1PolarityConfig
+
+// 测量的起始边沿
+#define            SPEED_TIM_STRAT_ICPolarity                TIM_ICPolarity_Rising
+// 测量的结束边沿
+#define            SPEED_TIM_END_ICPolarity                  TIM_ICPolarity_Falling
+
+
+// 定时器输入捕获用户自定义变量结构体声明
+typedef struct
+{   
+	uint8_t   Capture_FinishFlag;   // 捕获结束标志位
+	uint8_t   Capture_StartFlag;    // 捕获开始标志位  
+	uint16_t  Capture_CcrValue;     // 捕获寄存器的值
+	uint16_t  Capture_Period;       // 自动重装载寄存器更新标志 
+}TIM_ICUserValueTypeDef;
+
+
+
+
+extern TIM_ICUserValueTypeDef TIM_ICUserValueStructure;
+extern float speed;
+extern uint32_t TIM_PscCLK ;
+/**************************函数声明********************************/
+void SPEED_TIM_Init(void);
+
+
+
+#endif	/* __SPEED_H */
+
+
